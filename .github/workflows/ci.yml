@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    name: Smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install package + dev deps
+        run: uv pip install --system -e ".[mcp,dev]"
+
+      - name: Lint (ruff)
+        run: ruff check sage_mcp/
+
+      - name: Import smoke test
+        run: |
+          python -c "
+          import sage_mcp.cli
+          import sage_mcp.settings
+          import sage_mcp.parsing
+          import sage_mcp.searcher
+          import sage_mcp.indexer
+          import sage_mcp.store
+          import sage_mcp.mcp_server
+          print('all imports OK')
+          "
+
+      - name: CLI entrypoint (sage --help)
+        run: sage --help
+
+      - name: MCP entrypoint (sage-mcp --help)
+        run: sage-mcp --help
+
+      - name: Config parsing (sage list-kbs)
+        run: sage list-kbs --config config-example.yaml
+
+  publish:
+    name: Publish to PyPI
+    needs: smoke-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install hatch
+        run: pip install hatch
+
+      - name: Build
+        run: hatch build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

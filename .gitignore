@@ -1,0 +1,10 @@
+.env
+.qdrant/
+pipeline_cache/
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+config.yaml
+opencode.json

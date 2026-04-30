@@ -1,0 +1,11 @@
+## Results for "{{ query }}"
+
+| # | Score | KB | File | Excerpt |
+|---|------:|----|----- |---------|
+{% for r in results %}
+| {{ loop.index }} | {{ "%.3f" | format(r.score) }} | {{ r.kb }} | `{{ r.file_path }}` | {{ r.text_safe if excerpt_length == 0 else r.text_safe | truncate(excerpt_length, end="…") }} |
+{% endfor %}
+{% if duplicates_removed %}
+
+_{{ duplicates_removed }} duplicate(s) removed_
+{% endif %}

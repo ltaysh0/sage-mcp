@@ -1,0 +1,25 @@
+knowledge_bases:
+  - name: my-knowledge-store
+    path: /path/to/your/knowledge/base
+    description: My Knowledge Store
+    include_extensions: [.md]
+
+embedding:
+  provider: openai
+  model: text-embedding-3-small
+  # Or switch to ollama:
+  # provider: ollama
+  # model: nomic-embed-text
+  # base_url: http://ollama:11434
+
+qdrant:
+  mode: local
+  path: /base/path/.qdrant
+  collection: kb
+  # mode: server
+  # host: localhost
+  # port: 6333
+
+search:
+  top_k: 10 # Default number of search results
+  hybrid: true # Use both BM25 and vector search

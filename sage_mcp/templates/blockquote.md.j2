@@ -1,0 +1,14 @@
+## Results for "{{ query }}"
+{% for r in results %}
+
+### {{ loop.index }}. `{{ r.file_path }}`
+**Score:** {{ "%.3f" | format(r.score) }} · **KB:** {{ r.kb }}
+
+{% for line in r.text.splitlines() %}
+> {{ line }}
+{% endfor %}
+{% endfor %}
+{% if duplicates_removed %}
+
+_{{ duplicates_removed }} duplicate(s) removed_
+{% endif %}
